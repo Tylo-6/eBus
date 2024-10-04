@@ -1,0 +1,10 @@
+Package: ebus
+Version: 1.0
+Section: libs
+Priority: optional
+Architecture: amd64
+Depends: libc6 (>= 2.27)
+Maintainer: Tyler Ristimaki <tpristimaki@gmail.com>
+Homepage: https://github.com/Tylo-6/eBus
+Description: eBus event manager
+ An event bus that allows for inter-process communication by emitting and polling events on channels.
