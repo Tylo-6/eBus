@@ -10,6 +10,7 @@ license=('GPL-3.0')
 depends=('glibc')
 source=("https://github.com/Tylo-6/eBus/releases/download/v$pkgver-release/ebus-v$pkgver-release-x86_64.tar.gz")
 sha256sums=('SKIP')
+options=('!debug')
 
 package() {
     cd "$srcdir/ebus-v$pkgver-release-x86_64"

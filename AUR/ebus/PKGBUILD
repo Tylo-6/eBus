@@ -1,6 +1,6 @@
 # Maintainer: Tyler Ristimaki <tpristimaki@gmail.com>
 
-pkgname=ebus-bin
+pkgname=ebus
 pkgver=1.0.1
 pkgrel=1
 pkgdesc="An event bus that allows for inter-process communication by emitting and polling events on channels"
@@ -11,22 +11,27 @@ depends=('glibc')
 makedepends=('gcc')
 source=("https://github.com/Tylo-6/eBus/archive/refs/tags/v$pkgver-release.tar.gz")
 sha256sums=('SKIP')
+options=('!debug')
 
 build() {
-    cd "$srcdir/eBus"*
+    cd "$srcdir/eBus-"*
 
-    g++ -fPIC -shared -o "$pkgdir/usr/lib/memory.so" "src/memory.cpp"
-    g++ -fPIC -shared -o "$pkgdir/usr/lib/emitter.so" "src/emitter.cpp"
-    g++ -fPIC -shared -o "$pkgdir/usr/lib/listener.so" "src/listener.cpp"
+    mkdir -p "bin"
+
+    g++ -fPIC -shared -o "bin/memory.so" "src/memory.cpp"
+    g++ -fPIC -shared -o "bin/emitter.so" "src/emitter.cpp"
+    g++ -fPIC -shared -o "bin/listener.so" "src/listener.cpp"    
 }
 
 package() {
-    cd "$srcdir/eBus"*
+    cd "$srcdir/eBus-"*
 
-    install -Dm755 "lib/libebus.so" "$pkgdir/usr/lib/libebus.so"
+    install -Dm644 "include/ebus.hpp" "$pkgdir/usr/include/ebus.hpp"
     
-    install -Dm644 "include/ebus.h" "$pkgdir/usr/include/ebus.h"
-    
+    install -Dm755 "bin/memory.so" "$pkgdir/usr/lib/memory.so"
+    install -Dm755 "bin/listener.so" "$pkgdir/usr/lib/listener.so"
+    install -Dm755 "bin/emitter.so" "$pkgdir/usr/lib/emitter.so"
+
     install -Dm644 "LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
     install -Dm644 "README.md" "$pkgdir/usr/share/doc/$pkgname/README.md"
 }
