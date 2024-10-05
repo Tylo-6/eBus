@@ -1,3 +1,5 @@
+#define EBUS_EMITTER_VERSION 1
+
 #include <iostream>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -109,4 +111,7 @@ extern "C" void destroyEmitter(void* ptr) {
 }
 extern "C" bool emit(void*(*post)(void*, void*, size_t), void(*clear)(void*, void*), void* memPtr, void* ptr, void* src, size_t size) {
     return ((Emitter*)ptr)->emit(post, clear, memPtr, src, size);
+}
+extern "C" uint32_t getVersion() {
+    return EBUS_EMITTER_VERSION;
 }

@@ -1,6 +1,8 @@
 #ifndef EBUS_HPP
 #define EBUS_HPP
 
+#define EBUS_HEADER_VERSION 1
+
 #include <dlfcn.h>
 #include <iostream>
 #include <sys/mman.h>
@@ -20,6 +22,7 @@ void(*destroyEmitter)(void*) = nullptr;
 bool(*callEmit)(void*(*)(void*, size_t), void(*)(void*, void*), void*, void*, void*, size_t) = nullptr;
 void*(*post)(void*, size_t) = nullptr;
 void(*clear)(void*, void*) = nullptr;
+uint32_t(*emitterVersion)() = nullptr;
 struct Emitter {
 public:
     Emitter(const char* name) {
@@ -46,6 +49,7 @@ void*(*createListener)(const char*) = nullptr;
 void(*destroyListener)(void*) = nullptr;
 uint32_t(*callPoll)(uint32_t(*)(void*, void*, bool), void*, void*, void*) = nullptr;
 uint32_t(*getMem)(void*, void*, bool) = nullptr;
+uint32_t(*listenerVersion)() = nullptr;
 struct Listener {
 public:
     Listener(const char* name) {
@@ -69,11 +73,18 @@ private:
 void* memoryDL = nullptr;
 void*(*createMemory)(const char*) = nullptr;
 void(*destroyMemory)(void*) = nullptr;
+uint32_t(*memVersion)() = nullptr;
 
 int eBusInit() {
     int exitCode = 0;
-    memoryDL = dlopen("/usr/lib/memory.so", RTLD_LAZY);
+    memoryDL = dlopen("/usr/lib/memory.so", RTLD_NOW);
     if (!memoryDL) {
+        return exitCode;
+    }
+    memVersion = (uint32_t(*)())dlsym(memoryDL, "getVersion");
+    if (memVersion() != EBUS_HEADER_VERSION) {
+        dlclose(memoryDL);
+        memoryDL = nullptr;
         return exitCode;
     }
     exitCode += 1;
@@ -83,44 +94,64 @@ int eBusInit() {
 
     #ifdef EBUS_EMITTER
 
-    emitterDL = dlopen("/usr/lib/emitter.so", RTLD_LAZY);
+    emitterDL = dlopen("/usr/lib/emitter.so", RTLD_NOW);
     if (emitterDL) {
-        exitCode += 2;
+        emitterVersion = (uint32_t(*)())dlsym(emitterDL, "getVersion");
+        if (emitterVersion() != EBUS_HEADER_VERSION) {
+            dlclose(emitterDL);
+            emitterDL = nullptr;
+        } else {
+            exitCode += 2;
+            createEmitter = (void*(*)(const char*))dlsym(emitterDL, "createEmitter");
+            destroyEmitter = (void(*)(void*))dlsym(emitterDL, "destroyEmitter");
+            callEmit = (bool(*)(void*(*)(void*, size_t), void(*)(void*, void*), void*, void*, void*, size_t))dlsym(emitterDL, "emit");
+            post = (void*(*)(void*, size_t))dlsym(memoryDL, "post");
+            clear = (void(*)(void*, void*))dlsym(memoryDL, "clear");
+        }
     }
-    createEmitter = (void*(*)(const char*))dlsym(emitterDL, "createEmitter");
-    destroyEmitter = (void(*)(void*))dlsym(emitterDL, "destroyEmitter");
-    callEmit = (bool(*)(void*(*)(void*, size_t), void(*)(void*, void*), void*, void*, void*, size_t))dlsym(emitterDL, "emit");
-    post = (void*(*)(void*, size_t))dlsym(memoryDL, "post");
-    clear = (void(*)(void*, void*))dlsym(memoryDL, "clear");
+    
     
     #endif
 
     #ifdef EBUS_LISTENER
 
-    listenerDL = dlopen("/usr/lib/listener.so", RTLD_LAZY);
+    listenerDL = dlopen("/usr/lib/listener.so", RTLD_NOW);
     if (listenerDL) {
-        exitCode += 4;
+        listenerVersion = (uint32_t(*)())dlsym(listenerDL, "getVersion");
+        if (listenerVersion() != EBUS_HEADER_VERSION) {
+            dlclose(listenerDL);
+            listenerDL = nullptr;
+        } else {
+            exitCode += 4;
+            createListener = (void*(*)(const char*))dlsym(listenerDL, "createListener");
+            destroyListener = (void(*)(void*))dlsym(listenerDL, "destroyListener");
+            callPoll = (uint32_t(*)(uint32_t(*)(void*, void*, bool), void*, void*, void*))dlsym(listenerDL, "poll");
+            getMem = (uint32_t(*)(void*, void*, bool))dlsym(memoryDL, "getMem");
+        }
     }
-    createListener = (void*(*)(const char*))dlsym(listenerDL, "createListener");
-    destroyListener = (void(*)(void*))dlsym(listenerDL, "destroyListener");
-    callPoll = (uint32_t(*)(uint32_t(*)(void*, void*, bool), void*, void*, void*))dlsym(listenerDL, "poll");
-    getMem = (uint32_t(*)(void*, void*, bool))dlsym(memoryDL, "getMem");
 
     #endif
 
     return exitCode;
 }
 void eBusClose() {
-    destroyMemory(memory);
+    if (destroyMemory)
+        destroyMemory(memory);
 
-    dlclose(memoryDL);
+    if (memoryDL) {
+        dlclose(memoryDL);
+    }
 
     #ifdef EBUS_EMITTER
-    dlclose(emitterDL);
+    if (emitterDL) {
+        dlclose(emitterDL);
+    }
     #endif
 
     #ifdef EBUS_LISTENER
-    dlclose(listenerDL);
+    if (listenerDL) {
+        dlclose(listenerDL);
+    }
     #endif
 }
 

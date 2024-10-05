@@ -1,3 +1,5 @@
+#define EBUS_MEMORY_VERSION 1
+
 #include <iostream>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -183,4 +185,7 @@ extern "C" uint32_t getMem(void* ptr, void* src, void** dst, bool clear) {
 }
 extern "C" void clear(void* ptr, void* src) {
     return ((Memory*)ptr)->clear(src);
+}
+extern "C" uint32_t getVersion() {
+    return EBUS_MEMORY_VERSION;
 }

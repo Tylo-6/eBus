@@ -1,3 +1,5 @@
+#define EBUS_LISTENER_VERSION 1
+
 #include <iostream>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -143,4 +145,7 @@ extern "C" void destroyListener(void* ptr) {
 }
 extern "C" uint32_t poll(uint32_t(*getMem)(void*, void*, void*, bool), void* memPtr, void* ptr, void* dst) {
     return ((Listener*)ptr)->poll(getMem, memPtr, dst);
+}
+extern "C" uint32_t getVersion() {
+    return EBUS_LISTENER_VERSION;
 }
