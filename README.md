@@ -14,7 +14,7 @@ OR
 1. Download the debian package through releases
 2. Use the same `dpkg` command as listed above to install it
 ## Using eBus
-Include the provided C++ header file located at `dev/ebus.hpp` in your project as follows:
+Include the provided C++ header file located at `include/ebus.hpp` in your project as follows:
 ```
 #define EBUS_EMITTER // Include if program is an emitter
 #define EBUS_LISTENER // Include if program is a listener
