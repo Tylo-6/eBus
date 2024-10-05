@@ -3,8 +3,8 @@
 
 #define EBUS_HEADER_VERSION 1
 
-#include <dlfcn.h>
 #include <iostream>
+#include <dlfcn.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -12,6 +12,7 @@
 #include <cstring>
 #include <semaphore.h>
 #include <cerrno>
+#include <cstdint>
 
 void* memory = nullptr;
 

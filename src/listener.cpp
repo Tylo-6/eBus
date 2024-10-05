@@ -8,6 +8,7 @@
 #include <cstring>
 #include <semaphore.h>
 #include <cerrno>
+#include <cstdint>
 
 struct Listener {
 public:

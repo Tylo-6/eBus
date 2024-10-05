@@ -23,9 +23,11 @@ if command -v dpkg-deb &> /dev/null; then
 fi
 
 echo "Creating AUR package directory"
-AUR=ebus-v$pkgver-x86_64
+AUR=ebus-v$pkgver-release-x86_64
 mkdir -p $AUR
 echo "Building ebus-bin AUR package"
+echo "Copying license"
+cp LICENSE $AUR/LICENSE
 echo "Compiling memory.so"
 g++ -fPIC -shared -o $AUR/memory.so src/memory.cpp
 echo "Compiling emitter.so"
