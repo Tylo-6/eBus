@@ -1,5 +1,5 @@
 #!/bin/bash
-pkgver=1.0.0
+pkgver=1.0.1
 
 if command -v dpkg-deb &> /dev/null; then
     echo "Creating debian package directory"

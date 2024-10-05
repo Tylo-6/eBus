@@ -1,7 +1,7 @@
 # Maintainer: Tyler Ristimaki <tpristimaki@gmail.com>
 
 pkgname=ebus-bin
-pkgver=1.0.0
+pkgver=1.0.1
 pkgrel=1
 pkgdesc="An event bus that allows for inter-process communication by emitting and polling events on channels"
 arch=('x86_64')
