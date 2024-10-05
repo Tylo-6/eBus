@@ -9,20 +9,19 @@ url="https://github.com/Tylo-6/ebus"
 license=('GPL-3.0')
 depends=('glibc')
 makedepends=('gcc' 'g++')
-source=("https://github.com/Tylo-6/eBus/archive/refs/tags/$pkgver-release.tar.gz")
+source=("https://github.com/Tylo-6/eBus/archive/refs/tags/v$pkgver-release.tar.gz")
 sha256sums=('SKIP')
 
 build() {
-    cd "$srcdir/eBus-$pkgver-release"
+    cd "$srcdir/v$pkgver-release"
 
-    # Compile all C++ source files using g++
-    g++ -fPIC -shared -o ebus/usr/lib/memory.so src/memory.cpp
-    g++ -fPIC -shared -o ebus/usr/lib/emitter.so src/emitter.cpp
-    g++ -fPIC -shared -o ebus/usr/lib/listener.so src/listener.cpp
+    g++ -fPIC -shared -o "$pkgdir/usr/lib/memory.so" "src/memory.cpp"
+    g++ -fPIC -shared -o "$pkgdir/usr/lib/emitter.so" "src/emitter.cpp"
+    g++ -fPIC -shared -o "$pkgdir/usr/lib/listener.so" "src/listener.cpp"
 }
 
 package() {
-    cd "$srcdir/eBus-$pkgver-release"
+    cd "$srcdir/v$pkgver-release"
 
     install -Dm755 "lib/libebus.so" "$pkgdir/usr/lib/libebus.so"
     
